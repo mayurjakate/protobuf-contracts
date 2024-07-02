@@ -1,48 +1,40 @@
 name: Build and Publish Python Package
-
-on:
+'on':
   push:
     branches:
       - main
   pull_request:
     branches:
       - main
-
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
-
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install setuptools wheel twine
-
-    - name: Set up Miniconda
-      uses: conda-incubator/setup-miniconda@v2
-      with:
-        auto-activate-base: false
-        python-version: 3.8
-        environment-file: compile_targets/python/env/environment.yml
-        activate-environment: eventscontract-env
-
-    - name: Build package
-      run: |
-        chmod +x ./wheelPackProtoFiles.sh
-        ./wheelPackProtoFiles.sh
-
-    - name: Publish to GitHub Packages
-      run: |
-        python -m pip install --upgrade twine
-        twine upload --repository-url https://upload.pypi.org/legacy/ dist/*
-      env:
-        TWINE_USERNAME: ${{ secrets.GITHUB_ACTOR }}
-        TWINE_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install setuptools wheel twine
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          auto-activate-base: false
+          python-version: 3.8
+          environment-file: compile_targets/python/env/environment.yml
+          activate-environment: eventscontract-env
+      - name: Build package
+        run: |
+          chmod +x ./wheelPackProtoFiles.sh
+          ./wheelPackProtoFiles.sh
+      - name: Publish to GitHub Packages
+        run: |
+          python -m pip install --upgrade twine
+          twine upload --repository-url https://upload.pypi.org/legacy/ dist/*
+        env:
+          TWINE_USERNAME: '${{ secrets.PROTO_TOKEN }}'
+          TWINE_PASSWORD: '${{ secrets.USER_NAME }}'
