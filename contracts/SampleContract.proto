@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+
+// Sample Template Contract
+message TemplateContract {
+    string userName = 1;
+    string emailId = 2;
+    int32 age = 3;
+    string department = 4;
+    string country = 5;
+}
+
+
+//protoc -I=contracts --python_out=compile_targets/python/test/local/build contracts/SampleContract.proto
