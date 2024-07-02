@@ -36,8 +36,8 @@ jobs:
 
     - name: Build package
       run: |
-        chmod +x ./your_script.sh
-        ./your_script.sh
+        chmod +x ./wheelPackProtoFiles.sh
+        ./wheelPackProtoFiles.sh
 
     - name: Publish to GitHub Packages
       run: |
