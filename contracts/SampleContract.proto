@@ -11,4 +11,4 @@ message TemplateContract {
 }
 
 
-//protoc -I=contracts --python_out=compile_targets/python/test/local/build contracts/SampleContract.proto
+//protoc -I=contracts --python_out=compile_targets/python/test/build contracts/SampleContract.proto

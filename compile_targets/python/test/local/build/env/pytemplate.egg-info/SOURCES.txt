@@ -1,7 +1,0 @@
-setup.py
-pytemplate/SampleContract_pb2.py
-pytemplate/__init__.py
-pytemplate.egg-info/PKG-INFO
-pytemplate.egg-info/SOURCES.txt
-pytemplate.egg-info/dependency_links.txt
-pytemplate.egg-info/top_level.txt
