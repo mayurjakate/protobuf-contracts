@@ -16,4 +16,8 @@ jobs:
         run: echo "Hello, World!"
 
       - name: Disply name
-        run: echo "new test"
+        run: |
+            mkdir mytest
+            cd mytest 
+            touch mytest.txt
+            ls
