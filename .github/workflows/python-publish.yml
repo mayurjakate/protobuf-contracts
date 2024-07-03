@@ -44,10 +44,10 @@ jobs:
           chmod +x compile_targets/python/tools/wheelPackProtoFiles.sh
           ./compile_targets/python/tools/wheelPackProtoFiles.sh
 
-      - name: Publish to GitHub Packages
+      - name: Publish to PyPI
         run: |
           python -m pip install --upgrade twine
           twine upload --repository-url https://upload.pypi.org/legacy/ compile_targets/python/test/build/env/dist/*
         env:
-          TWINE_USERNAME: '${{ secrets.PROTO_TOKEN }}'
-          TWINE_PASSWORD: '${{ secrets.USER_NAME }}'
+          TWINE_USERNAME: '__token__'
+          TWINE_PASSWORD: '${{ secrets.PYPI_TOKEN }}'
