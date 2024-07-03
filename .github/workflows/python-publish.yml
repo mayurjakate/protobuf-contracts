@@ -35,8 +35,8 @@ jobs:
 
       - name: Build package
         run: |
-          chmod +x ./wheelPackProtoFiles.sh
-          ./wheelPackProtoFiles.sh
+          chmod +x compile_targets/python/tools/wheelPackProtoFiles.sh 
+          compile_targets/python/tools/wheelPackProtoFiles.sh 
 
       - name: Publish to GitHub Packages
         run: |
