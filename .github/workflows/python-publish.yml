@@ -33,6 +33,11 @@ jobs:
           environment-file: compile_targets/python/env/environment.yml
           activate-environment: eventscontract-env
 
+      - name: Initialize Conda
+        run: |
+            conda init bash
+            source ~/.bashrc
+            
       - name: Build package
         run: |
           chmod +x compile_targets/python/tools/wheelPackProtoFiles.sh 
