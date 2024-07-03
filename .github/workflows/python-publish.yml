@@ -20,4 +20,4 @@ jobs:
             mkdir mytest
             cd mytest 
             touch mytest.txt
-            ls
+            ls -a
