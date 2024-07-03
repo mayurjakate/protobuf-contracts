@@ -23,7 +23,7 @@ if [ -d "$buildFolderPath" ]; then
     cp -r "$envFolderPath" "$buildFolderPath"
 
     # Read the package name from setup.py file
-    packageFolderName=$(grep "packages=" "$buildEnvFolderPath/setup.py" | cut -d "'" -f 2)
+    packageFolderName=$(grep "name=" "$buildEnvFolderPath/setup.py" | cut -d "'" -f 2)
 
     # Create the necessary folder in the env directory with the package name
     mkdir -p "$buildEnvFolderPath/$packageFolderName"
@@ -60,8 +60,16 @@ if [ -d "$buildFolderPath" ]; then
     python setup.py sdist bdist_wheel
     echo "Python package build completed successfully."
     
-    # Install the package
-    pip install "$wheelFolder/$packageFolderName-0.0.0-py3-none-any.whl"
+    # Check if the wheel file is created
+    wheel_file="$wheelFolder/${packageFolderName}-0.0.1-py3-none-any.whl"
+    if [ -f "$wheel_file" ]; then
+        echo "Wheel file created successfully."
+        # Install the package
+        pip install "$wheel_file"
+    else
+        echo "Wheel file creation failed."
+        exit 1
+    fi
     
     # Back to Root Folder
     cd "$gitRepoPath"

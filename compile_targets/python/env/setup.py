@@ -1,13 +1,13 @@
-from setuptools import setup
-import os
-
-# variables
-PACKAGE_NAME = os.getenv('PACKAGE_NAME')
-PACKAGE_VERSION = os.getenv('PACKAGE_VERSION')
+from setuptools import setup, find_packages
 
 setup(
-    name=PACKAGE_NAME,
-    version=PACKAGE_VERSION,
-    author="Data Engeneering Team",
-    packages=['pytemplate'],
+    name='pytemplate',  # Update with your package name
+    version='0.0.1',  # Update with your package version
+    author='Mayur',  # Update with the author's name
+    author_email='mdjakate@gmail.com',  # Update with the author's email
+    url='https://github.com/mayurjakate/protobuf-contracts',  # Update with your repository URL
+    packages=find_packages(),
+    install_requires=[
+        # List your package dependencies here
+    ],
 )
