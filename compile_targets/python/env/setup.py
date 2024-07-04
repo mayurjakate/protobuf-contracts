@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='mayur_pytemplate',  # Update with your package name
+    name='protobuf_pytemplate',  # Update with your package name
     version='0.0.1',  # Update with your package version
     author='Mayur',  # Update with the author's name
     author_email='mdjakate@gmail.com',  # Update with the author's email
