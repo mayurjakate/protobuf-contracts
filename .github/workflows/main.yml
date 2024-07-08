@@ -52,7 +52,8 @@ jobs:
               PACKAGE_NAME=`echo $TAG_NAME          | awk -F '-' '{print $1}'`
               PACKAGE_VERSION=`echo $TAG_NAME       | awk -F '-' '{print $2}'`
               PACKAGE_STATUS=`echo $TAG_NAME        | awk -F '-' '{print $3}'`
-              PROTO_PATH=`contracts`
+              # Hardcode PROTO_PATH to "contacts"
+              PROTO_PATH="contacts"
               if  [[ "${PACKAGE_STATUS}" =~ "${{ vars.TAG_PRERELEASE_IDENTITY }}" ]]; then
                   PACKAGE_STATUS="-${PACKAGE_STATUS}";
               fi
