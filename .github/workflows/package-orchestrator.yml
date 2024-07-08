@@ -41,8 +41,8 @@ jobs:
               wget https://github.com/protocolbuffers/protobuf/releases/download/v26.0/protoc-26.0-linux-x86_64.zip
               unzip protoc-26.0-linux-x86_64.zip -d protobuf
       
-      - name: Generate CSharp Packages
-        uses: ./.github/actions/csharp
+      - name: Generate Python Packages
+        uses: ./.github/actions/python
         with:
           TAG_NAME:
             ${{ inputs.TAG_NAME }}
