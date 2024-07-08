@@ -1,0 +1,57 @@
+name: Package Workflow
+
+on:
+  workflow_call:
+
+    inputs:
+      TAG_NAME:
+        required: true
+        type: string
+      PACKAGE_NAME:
+        required: true
+        type: string
+      PACKAGE_VERSION:
+        required: true
+        type: string
+      PACKAGE_STATUS:
+        required: true
+        type: string
+      PROTO_PATH:
+        required: true
+        type: string
+       
+    
+    secrets:
+      TOKEN_GITHUB:
+        required: true
+
+
+jobs:
+  packages:
+    runs-on: ubuntu-latest
+    steps:
+      
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: Install Protobuf Files
+        run: |
+              echo " "
+              echo "=== PROTOBUF INSTALL ====================================================================================="
+              wget https://github.com/protocolbuffers/protobuf/releases/download/v26.0/protoc-26.0-linux-x86_64.zip
+              unzip protoc-26.0-linux-x86_64.zip -d protobuf
+      
+      - name: Generate CSharp Packages
+        uses: ./.github/actions/csharp
+        with:
+          TAG_NAME:
+            ${{ inputs.TAG_NAME }}
+          PACKAGE_NAME:
+            ${{ inputs.PACKAGE_NAME }}
+          PACKAGE_VERSION:
+            ${{ inputs.PACKAGE_VERSION }}
+          PACKAGE_STATUS:
+            ${{ inputs.PACKAGE_STATUS }}
+          PROTO_PATH:
+            ${{ inputs.PROTO_PATH }}
+           
