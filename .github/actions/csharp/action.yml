@@ -1,0 +1,204 @@
+name: 'Csharp'
+description: 'Csharp Proto'
+
+# Parameters
+inputs:
+  TAG_NAME:
+    description: 'Git Tag Name'
+    required: true
+
+  PACKAGE_NAME:
+    description: 'Package Name'
+    required: true
+
+  PACKAGE_VERSION:
+    description: 'Package Version'
+    required: true
+
+  PACKAGE_STATUS:
+    description: 'Package Status'
+    default: ""
+
+  PROTO_PATH:
+    description: 'Proto Path Folder'
+    required: true
+  
+  TOKEN_GITHUB:
+    description: 'GitHub Token Secret'
+    required: true
+  
+  URL_GITHUB:
+    description: 'GitHub URL'
+    required: true
+  
+  DOTNET_VERSION:
+    description: 'Dotnet version'
+    required: true
+  
+  PROTOBUF_VERSION:
+    description: 'Protobuf version'
+    required: true
+  
+  DOTNET_TARGET_FRAMEWORKS:
+    description: 'Target Framework'
+    required: true
+  
+  NUGET_API_NAME:
+    description: 'Nuget API source name'
+    required: false
+    default: 'nuget.org'
+  
+  NUGET_API_SOURCE:
+    description: 'Nuget API source link'
+    required: true
+  
+  AUTOMATED_TEST_PATH:
+    description: 'Automated Test Path'
+    required: true
+  
+  TAG_CREATED_FLAG:
+    description: 'Flag that indicates if tag was created'
+    required: true
+
+# Execution
+runs:
+  using: "composite"
+  steps:
+    
+    # Installing SDK - Dotnet
+    - name: Installing SDK - Dotnet (Echo)
+      shell: bash
+      run: |
+            echo " "
+            echo "=== INSTALLING SDK - DOTNET =================================================================================="
+    
+    - name: Installing SDK - Dotnet (Install)
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '${{ inputs.DOTNET_VERSION }}.x'
+      
+    # Nuget Source List
+    - name: Nuget Source List
+      shell: bash
+      run: |
+            echo " "
+            echo "=== CLEAR NUGET LOCAL ========================================================================================"
+            dotnet nuget locals all --clear
+            echo " "
+      
+    # Packages to Build
+    - name: Package Build
+      shell: bash
+      run: |
+            echo " "
+            echo "=== PACKAGE BUILD ============================================================================================"
+            echo "»»» ${{ inputs.TAG_NAME }}"
+            echo " "
+    
+    # Generate Nuget Package
+    - name: Protobuf Compilation
+      id: paths
+      shell: bash
+      run:  | #
+            RootPath=$(pwd)
+            PackageFolder="${RootPath}/compile/csharp/${{ inputs.TAG_NAME }}"
+            PROTO_PATH="${RootPath}/${{ inputs.PROTO_PATH }}/"
+            
+            echo "=== PROTOBUF COMPILATION ====================================================================================="
+            echo "»»» Package Name: ${{ inputs.PACKAGE_NAME }}"
+            echo "»»» Package Path: $PackageFolder"
+            echo "»»» Proto Path:   $PROTO_PATH"
+            echo " "
+
+            echo "=== CREATING CLASSLIB ========================================================================================"
+            dotnet new classlib -f net${{ inputs.DOTNET_VERSION }} --name "${{ inputs.PACKAGE_NAME }}" -o "$PackageFolder"
+            echo "»»» DotNet Env Created: ${{ inputs.PACKAGE_NAME }} in $PackageFolder Folder"
+            echo "»»» Folder: $PackageFolder"
+            echo " "
+            
+            echo "=== COMPILING PROTOBUF ======================================================================================="
+            cd $RootPath
+            find "$PROTO_PATH" -type f -iname "*.proto" -exec protobuf/bin/protoc --csharp_out="$PackageFolder" --proto_path="$PROTO_PATH" {} \;
+            echo "»»» csharp files generated on: $PackageFolder"
+            cd $PackageFolder
+            echo "»»» Folder Content check: "
+            ls
+            echo " "
+            
+            echo "=== INSTALLING GOOGLE PROTOBUF PACKAGE ======================================================================="
+            cd $PackageFolder
+            dotnet add package Google.Protobuf --version ${{ inputs.PROTOBUF_VERSION }} --source ${{ inputs.NUGET_API_SOURCE }}
+            echo " "
+
+            echo "=== COMPILING NUGET PACKAGE =================================================================================="
+            PackageVersion="${{ inputs.PACKAGE_VERSION }}${{ inputs.PACKAGE_STATUS }}"
+            dotnet pack -p:PackageVersion="$PackageVersion" -p:TargetFrameworks="${{ inputs.DOTNET_TARGET_FRAMEWORKS }}" --output "nuget"
+            echo " "
+            echo "»»» Nuget Package Created: ${{ inputs.TAG_NAME }}"
+            echo "»»» Folder: $PackageFolder"
+            echo "»»» Package Content check: "
+            find nuget -type f
+            echo " "
+    
+    # Publish Artifacts
+    - name: Publish Packages as Artifact
+      uses: actions/upload-artifact@master
+      with:
+        name: "csharp-${{ inputs.TAG_NAME }}"
+        path: "compile/csharp/${{ inputs.TAG_NAME }}/nuget/${{ inputs.PACKAGE_NAME }}.${{ inputs.PACKAGE_VERSION }}${{ inputs.PACKAGE_STATUS }}.nupkg"
+    
+    # Test Nuget Package
+    - name: Test Nuget Package
+      shell: bash
+      run:  | #
+            RootPath=$(pwd)
+            PackageVersion="${{ inputs.PACKAGE_VERSION }}${{ inputs.PACKAGE_STATUS }}"
+            PackageNameVersion="${{ inputs.PACKAGE_NAME }}.${PackageVersion}"
+            PackageFullPath="${RootPath}/compile/csharp/${{ inputs.TAG_NAME }}/nuget/${PackageNameVersion}.nupkg"
+            AutomatedTestPath="${RootPath}/${{ inputs.AUTOMATED_TEST_PATH }}/csharp"
+
+            echo " "
+            echo "=== CHECKING XUNIT PROJECT FOLDERS ==========================================================================="
+            echo "»»» Automated csharp Test Folder Content check: "
+            cd $AutomatedTestPath
+            ls
+            
+            echo " "
+            echo "=== COPYING NUGET PACKAGE TO XUNIT PROJECT (LIB) ============================================================="
+            cp "$PackageFullPath" "lib"
+            echo "»»» Lib Folder Content check: "
+            find lib -type f
+
+            echo " "
+            echo "=== INSTALLING NUGET PACKAGE TO XUNIT PROJECT ================================================================"
+            dotnet restore
+            dotnet add package "${{ inputs.PACKAGE_NAME }}" --version "$PackageVersion" --source "lib"
+
+            echo " "
+            echo "=== NUGET SOURCE LIST ========================================================================================"
+            dotnet nuget list source
+
+            echo " "
+            echo "=== CHECKING XUNIT DEPENDENCIES =============================================================================="
+            cat csharp.csproj
+
+            echo " "
+            echo "=== RUNNING XUNIT PROJECT ===================================================================================="
+            dotnet test
+            echo " "
+            echo " "
+    
+    # Publish Package into GitHub Container
+    - name: Publish Package into GitHub
+      shell: bash
+      if: ${{ inputs.TAG_CREATED_FLAG == 'true' }}
+      run:  |
+            echo "=== PUBLISHING - ${{ inputs.TAG_NAME }} NUGET PACKAGE ====================="
+            RootPath=$(pwd)
+            PackageVersion="${{ inputs.PACKAGE_VERSION }}${{ inputs.PACKAGE_STATUS }}"
+            PackageNameVersion="${{ inputs.PACKAGE_NAME }}.${PackageVersion}"
+            PackageFullPath="${RootPath}/compile/csharp/${{ inputs.TAG_NAME }}/nuget/"
+            cd $PackageFullPath
+            ls
+            echo " "
+            dotnet nuget push "${PackageNameVersion}.nupkg" --source "${{ inputs.URL_GITHUB }}" --api-key "${{ inputs.TOKEN_GITHUB }}"

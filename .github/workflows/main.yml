@@ -84,7 +84,7 @@ jobs:
 
           echo "»»» Tag Created Flag: ${TAG_CREATED_FLAG}"
 
-          echo " "
+          echo "  "
       - name: Validations
         run: >
           echo "=== VALIDATIONS
