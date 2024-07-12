@@ -1,0 +1,127 @@
+name: 'Python'
+description: 'Publish Python Package Proto'
+
+# Parameters
+inputs:
+  TAG_NAME:
+    description: 'Git Tag Name'
+    required: true
+
+  PACKAGE_NAME:
+    description: 'Package Name'
+    required: true
+
+  PACKAGE_VERSION:
+    description: 'Package Version'
+    required: true
+
+  PACKAGE_STATUS:
+    description: 'Package Status'
+    default: ""
+
+  PROTO_PATH:
+    description: 'Proto Path Folder'
+    required: true
+
+# Execution
+runs:
+  using: "composite"
+  steps:
+    - name: Define Variables 
+      shell: bash
+      run: | #
+        echo " "
+        echo "=== VARIABLES DEFINITION ====================================================================================="
+        echo "PACKAGE_NAME=${{ inputs.PACKAGE_NAME }}" >> $GITHUB_ENV
+        echo "PACKAGE_VERSION=${{ inputs.PACKAGE_VERSION }}" >> $GITHUB_ENV
+
+    # setup python 
+    - name: Setup Python - (Echo)
+      shell: bash
+      run: |
+            echo " "
+            echo "=== SET UP PYTHON =================================================================================="
+    
+    # - name: Setup Python
+    #   uses: actions/setup-python@v5
+    #   with:
+    #     python-version: '${{ inputs.PYTHON_VERSION }}'
+
+    # # install and upgrade pip 
+    # - name: Install pip
+    #   shell: bash
+    #   run: | #
+    #         echo " "
+    #         echo "=== INSTALL AND UPGRADE PIP =================================================================================="
+    #         python -m pip install --upgrade pip
+
+    # # Compile protobuf 
+    # - name: Protobuf Compilation
+    #   id: paths
+    #   shell: bash
+    #   run:  | #
+    #         RootPath=$(pwd)
+    #         PackageFolder="${RootPath}/dip/env/python/${{ inputs.PROTO_PATH }}/pyfiles/"
+    #         ProtoFolder="${RootPath}/${{ inputs.PROTO_PATH }}/"
+
+    #         echo " "
+    #         echo "=== PROTOBUF COMPILATION ====================================================================================="
+    #         echo "»»» Package Name: ${{ inputs.PACKAGE_NAME }}"
+    #         echo "»»» Proto Folder: $ProtoFolder"
+    #         echo "»»» Package Path: $PackageFolder"
+    #         echo " "
+    
+    #         echo "=== COMPILING PROTOBUF ======================================================================================="
+    #         cd $RootPath
+    #         find "$ProtoFolder" -type f -iname "*.proto" -exec protobuf/bin/protoc --python_out="$PackageFolder" --proto_path="$ProtoFolder" {} \;
+    #         echo "»»» python files generated on: $PackageFolder"
+    #         cd $PackageFolder
+    #         echo "»»» Folder Content check: "
+    #         ls
+    #         echo " "
+
+    #         echo "=== CREATE INIT FILE ======================================================================================="
+    #         find "$PackageFolder" -type f -iname "*_pb2.py" -exec basename {} \; > __init__.py 
+    #         echo "»»» Init File Content check: "
+    #         cat  __init__.py
+    #         echo " "
+
+
+    # - name: Install build
+    #   shell: bash
+    #   run: | #
+    #     RootPath=$(pwd)
+    #     PackageFolder="${RootPath}/dip/env/python/${{ inputs.PROTO_PATH }}/"
+    #     cd $PackageFolder
+
+    #     echo " "
+    #     echo "=== INSTALL BUILD - PYTHON PACKAGE ====================================================================================="
+    #     python -m pip install build 
+
+    # - name: Build a binary wheel and a source 
+    #   shell: bash
+    #   run: | #
+    #     echo " "
+    #     echo "=== VARIABLES NAMES ====================================================================================="
+    #     echo "»»» Package Name: $PACKAGE_NAME"
+    #     echo "»»» Package Version: $PACKAGE_VERSION"
+
+    #     RootPath=$(pwd)
+    #     PackageFolder="${RootPath}/dip/env/python/${{ inputs.PROTO_PATH }}/"
+    #     cd $PackageFolder
+        
+    #     echo " "
+    #     echo "=== CREATE PYTHON PACKAGE ON DIST FOLDER ====================================================================================="
+    #     python -m build --sdist --wheel --outdir dist/ 
+        
+    #     echo "»»» dist/ folder Content check: "
+    #     cd dist/
+    #     ls
+
+    # # Publish Artifacts
+    # - name: Publish Packages as Artifact
+    #   uses: actions/upload-artifact@master
+    #   with:
+    #     name: "python-${{ inputs.TAG_NAME }}"
+    #     path: "dip/env/python/${{ inputs.PROTO_PATH }}/dist/${{ inputs.PACKAGE_NAME }}-${{ inputs.PACKAGE_VERSION }}-py3-none-any.whl"
+    
